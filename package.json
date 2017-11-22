@@ -25,7 +25,11 @@
   "homepage": "https://github.com/marcelotoi/theVelopsApi#readme",
   "devDependencies": {
     "babel-eslint": "^8.0.2",
-    "nodemon": "^1.12.1"
+    "babel-jest": "^21.2.0",
+    "faker": "^4.1.0",
+    "jest": "^21.2.1",
+    "nodemon": "^1.12.1",
+    "supertest": "^3.0.0"
   },
   "dependencies": {
     "eslint": "^4.11.0",

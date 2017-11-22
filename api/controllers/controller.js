@@ -2,9 +2,11 @@
 
 const mongoose = require('mongoose'),
 	User = mongoose.model('Users');
-	const RegisteredUser = mongoose.model('RegisteredUsers');
+const RegisteredUser = mongoose.model('RegisteredUsers');
 
-
+/**
+*Lista todos os usuários do banco de dados
+*/
 exports.list_all_users = function(req, res) {
 	if(!req.session.registeredUser)
 		return res.json({message: 'You need to log in first!'});
@@ -13,53 +15,63 @@ exports.list_all_users = function(req, res) {
 		  res.send(err);
 		}
 		res.json(user);
-		return res.status(200).send();
 	});
 };
 
-
+/**
+*Cria um usuário no banco de dados
+*/
 exports.create_an_user = function(req,res){
-	if(!req.session.registeredUser)
+	if(!req.session.registeredUser) //Verifica se o usuario esta logado
 		return res.json({message: 'You need to log in first!'});
 	const new_user = new User(req.body);
 	new_user.save(function(err,user){
 		if(err){
 			res.send(err);
 		}
-		return res.status(201).send();
 		res.json(user);
 
 	});
 };
 
+/**
+*Procura por um usário no banco de dados pela ID
+*/
 exports.read_an_user = function(req, res) {
-	if(!req.session.registeredUser)
+	if(!req.session.registeredUser) //Verifica se o usuario esta logado
 		return res.json({message: 'You need to log in first!'});
-	User.findById({_id: req.params.id}, function(err, user) {
+	User.findById({_id: req.params.id}, function(err, user) { //Procura a ID inserida na url no banco de dados
 		if (err){
-			res.send(err);
+    	if (err.message.indexOf('Cast to ObjectId failed') !== -1){ //Identifica o erro: ID nao foi reconhecida
+				console.log(err);
+				res.status(404).send('User not found');
+			}else{
+				res.send(err);
+			}
 		}
 		res.json(user);
-		return res.status(200).send();
 	});
 };
 
-
+/**
+*Atualiza as informações de um usuário do banco de dados
+*/
 exports.update_an_user = function(req, res) {
-	if(!req.session.registeredUser)
+	if(!req.session.registeredUser) //Verifica se o usuario esta logado
 		return res.json({message: 'You need to log in first!'});
 	User.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function(err, user) {
 		if (err){
 			res.send(err);
 		}
 		res.json(user);
-		return res.status(200).send();
 	});
 };
 
-
+/**
+*Deleta um usuário do banco de dados a partir da ID
+*/
 exports.delete_an_user = function(req, res) {
-	if(!req.session.registeredUser)
+	if(!req.session.registeredUser) //Verifica se o usuario esta logado
 		return res.json({message: 'You need to log in first!'});
 	User.remove({
 		_id: req.params.id
@@ -67,11 +79,13 @@ exports.delete_an_user = function(req, res) {
 		if (err){
 			res.send(err);
 		}
-		return res.status(200).send();
 		res.json({ message: 'User successfully deleted' });
 	});
 };
 
+/**
+*Registra o usuários para Basic Auth
+*/
 exports.register = function(req,res){
 	const username = req.body.username;
 	const password = req.body.password;
@@ -80,24 +94,34 @@ exports.register = function(req,res){
 	newUser.password = password;
 	newUser.save(function(err,savedUser){
 		if(err){
-			console.log(err);
+			res.json(err);
 		}
-		res.json({message: 'User successfully registered' })
-	})
+		res.json({message: 'User successfully registered' });
+	});
 };
 
+/**
+*Faz o login do usuário na Basic Auth
+*/
 exports.login = function(req,res){
 	const username = req.body.username;
 	const password = req.body.password;
 
 	RegisteredUser.findOne({username: username, password: password}, function(err,registeredUser){
-		if(err){
-			res.json(err);
+		if (err){
+    	if (err.message.indexOf('Cast to ObjectId failed') !== -1){
+				console.log(err);
+				res.status(401).send('User not registered');
+			}else{
+				res.send(err);
+			}
+		}else{
+			if(!registeredUser){
+				res.status(401).json('User not registered');
+			}else{
+				req.session.registeredUser = registeredUser;
+				res.json('User successfully logged in');
+			}
 		}
-		if(!registeredUser){
-			return res.status(404).send();
-		}
-		req.session.registeredUser = registeredUser;
-		res.json({message: 'User successfully logged in' })
-	})
+	});
 };
