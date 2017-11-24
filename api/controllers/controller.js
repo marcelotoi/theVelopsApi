@@ -1,3 +1,8 @@
+/**
+ * @fileOverview Funções a serem ligadas às rotas
+ * @author Marcelo Peres Toi
+ * @version 1.0.0
+ */
 'use strict';
 
 const mongoose = require('mongoose'),
@@ -5,7 +10,7 @@ const mongoose = require('mongoose'),
 const RegisteredUser = mongoose.model('RegisteredUsers');
 
 /**
-*Lista todos os usuários do banco de dados
+*Lista todos os usuários do banco de dados.
 */
 exports.list_all_users = function(req, res) {
 	if(!req.session.registeredUser)
@@ -19,7 +24,7 @@ exports.list_all_users = function(req, res) {
 };
 
 /**
-*Cria um usuário no banco de dados
+*Cria um usuário no banco de dados.
 */
 exports.create_an_user = function(req,res){
 	if(!req.session.registeredUser) //Verifica se o usuario esta logado
@@ -27,7 +32,7 @@ exports.create_an_user = function(req,res){
 	const new_user = new User(req.body);
 	new_user.save(function(err,user){
 		if(err){
-			res.send(err);
+			res.status(400).send('Something went wrong! Make sure that the request has a first_name, a last_name, an email and a personal_phone');
 		}
 		res.json(user);
 
@@ -35,14 +40,14 @@ exports.create_an_user = function(req,res){
 };
 
 /**
-*Procura por um usário no banco de dados pela ID
+*Procura por um usário no banco de dados pela ID.
 */
 exports.read_an_user = function(req, res) {
 	if(!req.session.registeredUser) //Verifica se o usuario esta logado
 		return res.json({message: 'You need to log in first!'});
 	User.findById({_id: req.params.id}, function(err, user) { //Procura a ID inserida na url no banco de dados
 		if (err){
-    	if (err.message.indexOf('Cast to ObjectId failed') !== -1){ //Identifica o erro: ID nao foi reconhecida
+    	if (err.message.indexOf('Cast to ObjectId failed') !== -1){ //Identifica se o erro é: ID não foi reconhecida
 				console.log(err);
 				res.status(404).send('User not found');
 			}else{
@@ -54,37 +59,45 @@ exports.read_an_user = function(req, res) {
 };
 
 /**
-*Atualiza as informações de um usuário do banco de dados
+*Atualiza as informações de um usuário do banco de dados.
 */
 exports.update_an_user = function(req, res) {
 	if(!req.session.registeredUser) //Verifica se o usuario esta logado
 		return res.json({message: 'You need to log in first!'});
 	User.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function(err, user) {
 		if (err){
-			res.send(err);
+    	if (err.message.indexOf('Cast to ObjectId failed') !== -1){ //Identifica se o erro é: ID não foi reconhecida
+				console.log(err);
+				res.status(404).send('User not found');
+			}else{
+				res.send(err);
+			}
 		}
 		res.json(user);
 	});
 };
 
 /**
-*Deleta um usuário do banco de dados a partir da ID
+*Deleta um usuário do banco de dados a partir da ID.
 */
 exports.delete_an_user = function(req, res) {
 	if(!req.session.registeredUser) //Verifica se o usuario esta logado
 		return res.json({message: 'You need to log in first!'});
-	User.remove({
-		_id: req.params.id
-	}, function(err, user) {
+	User.remove({_id: req.params.id}, function(err, user) {
 		if (err){
-			res.send(err);
+    	if (err.message.indexOf('Cast to ObjectId failed') !== -1){ //Identifica se o erro é: ID não foi reconhecida
+				console.log(err);
+				res.status(404).send('User not found');
+			}else
+				res.send(err);
+		}else{
+			res.json({ message: 'User successfully deleted' });
 		}
-		res.json({ message: 'User successfully deleted' });
 	});
 };
 
 /**
-*Registra o usuários para Basic Auth
+*Registra o usuário para Basic Auth.
 */
 exports.register = function(req,res){
 	const username = req.body.username;
@@ -101,7 +114,7 @@ exports.register = function(req,res){
 };
 
 /**
-*Faz o login do usuário na Basic Auth
+*Faz o login do usuário na Basic Auth.
 */
 exports.login = function(req,res){
 	const username = req.body.username;

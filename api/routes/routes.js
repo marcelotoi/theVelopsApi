@@ -1,3 +1,8 @@
+/**
+ * @fileOverview Definição das rotas
+ * @author Marcelo Peres Toi
+ * @version 1.0.0
+ */
 'use strict';
 module.exports = function(app) {
 	const api = require('../controllers/controller');
