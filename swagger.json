@@ -1,0 +1,284 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "theVelopsAPI",
+    "version": "1.0.0",
+    "title": "theVelops API REST",
+    "contact": {
+      "email": "marcelo_toi@hotmail.com"
+    }
+  },
+  "basePath": "/v2",
+  "tags": [
+    {
+      "name": "users",
+      "description": "Lista de usuários"
+    },
+    {
+      "name": "register",
+      "description": "Registro do usuário"
+    },
+    {
+      "name": "login",
+      "description": "Login do usuário"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Retorna uma lista dos usuários no banco de dados",
+        "description": "Retorna uma lista com todos os usuários salvos no banco de dados",
+        "operationId": "list_all_users",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Adiciona um usuário ao banco de dados",
+        "description": "",
+        "operationId": "create_an_user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Informações do usuário",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Operação inválida"
+          }
+        }
+      }
+    },
+    "/users/:id": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Procura por um usuário no banco de dados por ID",
+        "description": "A ID do usuário deve ser exata para ser bem sucedido. Utilize get /users para obter as ID dos usuários.",
+        "operationId": "read_an_user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID do usuário a ser buscado no banco de dados",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Deleta um usuário do banco de dados por ID",
+        "description": "A ID do usuário deve ser exata para ser bem sucedido. Utilize get /users para obter as ID dos usuários.",
+        "operationId": "delete_an_user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID do usuário a ser deletado",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuário deletado"
+          },
+          "404": {
+            "description": "Usuário não encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Atualiza um usuário no banco de dados por ID",
+        "description": "Atualiza as informações de um usuário que já existe no banco de dados",
+        "operationId": "update_an_user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID do usuário a ser atualizado",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Created user object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "login"
+        ],
+        "summary": "Realiza o login de um usuário registrado",
+        "description": "",
+        "operationId": "login",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objeto de um usuário registrado",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegisteredUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida"
+          },
+          "401": {
+            "description": "Usuário não registrado"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "tags": [
+          "register"
+        ],
+        "summary": "Realiza o registro de um usuário para autenticação",
+        "description": "",
+        "operationId": "register",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objeto de um usuário registrado",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegisteredUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "personal_phone": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "Order"
+      }
+    },
+    "RegisteredUser": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
